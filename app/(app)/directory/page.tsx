@@ -124,7 +124,7 @@ export default function DirectoryPage() {
 
         {connections.length > 0 && (
           <div className="list" style={{ marginBottom: 12 }}>
-            <h2 className="label" style={{ padding: '0 16px', marginBottom: 6 }}>
+            <h2 className="label" style={{ padding: '14px 20px' }}>
               People you&rsquo;ve connected with
             </h2>
             {connections.map((c) => (
@@ -154,7 +154,7 @@ export default function DirectoryPage() {
         {shown.length > 0 && (
           <div className="list">
             {connections.length > 0 && (
-              <h2 className="label" style={{ padding: '0 16px', marginBottom: 6 }}>
+              <h2 className="label" style={{ padding: '14px 20px' }}>
                 Alumni
               </h2>
             )}

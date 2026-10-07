@@ -48,7 +48,7 @@ If you ever change the app's domain, update the `webhook_url` row in `app_config
 
 ### Resumes
 
-Anyone can upload one resume (PDF, up to 5 MB) from their profile page; any approved signed-in user can view it, same as the rest of a profile. Run `supabase/resumes.sql` once in the SQL Editor to create the storage bucket and its access rules. No new environment variables needed.
+Current members can upload one resume (PDF, up to 5 MB) from their profile page; any approved signed-in user, including alumni, can view it (so an alum can review it), same as the rest of a profile. Alumni do not get this option. Run `supabase/resumes.sql` once in the SQL Editor to create the storage bucket and its access rules. No new environment variables needed.
 
 ## How it works
 

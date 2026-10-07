@@ -104,7 +104,7 @@ export default function ProfilePage() {
                 <span>LinkedIn</span>
               </a>
             )}
-            {data?.resumeUrl && (
+            {!isAlum && data?.resumeUrl && (
               <a className="row-start" style={{ gap: 8 }} href={data.resumeUrl} target="_blank" rel="noopener noreferrer">
                 <Icon name="file" size={18} />
                 <span>Resume (PDF)</span>

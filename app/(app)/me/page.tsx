@@ -38,8 +38,9 @@ export default function MePage() {
   const [resumeError, setResumeError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (isAlum) return;
     getResumeUrl(me.id).then(setResumeUrl);
-  }, [me.id]);
+  }, [me.id, isAlum]);
 
   async function handleResumeFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -179,24 +180,26 @@ export default function MePage() {
             <textarea id="bio" rows={4} maxLength={600} placeholder={isAlum ? 'What you cover and what you are happy to talk about.' : 'What you are working on and interested in.'} value={form.bio} onChange={set('bio')} />
           </div>
 
-          <div className="field">
-            <span className="field-label">Resume (PDF)</span>
-            {resumeUrl ? (
-              <div className="row-start" style={{ gap: 10 }}>
-                <a className="btn" href={resumeUrl} target="_blank" rel="noopener noreferrer">
-                  <Icon name="file" size={18} />
-                  View resume
-                </a>
-                <button type="button" className="btn" onClick={handleResumeRemove} disabled={resumeBusy}>
-                  Remove
-                </button>
-              </div>
-            ) : (
-              <span className="small muted">No resume uploaded yet.</span>
-            )}
-            <input type="file" accept="application/pdf" onChange={handleResumeFile} disabled={resumeBusy} />
-            <ErrorNote>{resumeError}</ErrorNote>
-          </div>
+          {!isAlum && (
+            <div className="field">
+              <span className="field-label">Resume (PDF)</span>
+              {resumeUrl ? (
+                <div className="row-start" style={{ gap: 10 }}>
+                  <a className="btn" href={resumeUrl} target="_blank" rel="noopener noreferrer">
+                    <Icon name="file" size={18} />
+                    View resume
+                  </a>
+                  <button type="button" className="btn" onClick={handleResumeRemove} disabled={resumeBusy}>
+                    Remove
+                  </button>
+                </div>
+              ) : (
+                <span className="small muted">No resume uploaded yet.</span>
+              )}
+              <input type="file" accept="application/pdf" onChange={handleResumeFile} disabled={resumeBusy} />
+              <ErrorNote>{resumeError}</ErrorNote>
+            </div>
+          )}
 
           {isAlum && (
             <>

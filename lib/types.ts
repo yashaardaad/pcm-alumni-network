@@ -68,6 +68,17 @@ export type Message = {
   sender: { full_name: string } | null;
 };
 
+export type EventFile = {
+  id: string;
+  event_id: string;
+  storage_path: string;
+  file_name: string;
+  content_type: string;
+  size_bytes: number;
+  uploaded_by: string | null;
+  created_at: string;
+};
+
 export type EventRow = {
   id: string;
   title: string;
@@ -77,7 +88,8 @@ export type EventRow = {
   ends_at: string | null;
   audience: Audience;
   created_by: string;
-  event_rsvps: { user_id: string }[];
+  event_rsvps: { user_id: string; profile: { full_name: string } | null }[];
+  event_files: EventFile[];
 };
 
 export type AdminUser = {

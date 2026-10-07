@@ -37,7 +37,7 @@ Push the project to GitHub, import it into Vercel (or any host that runs Next.js
 
 ### Email notifications
 
-People get an email when a request comes in or gets accepted, a weekly digest of open requests and unread chat, and admins get a daily reminder if any accounts are waiting for approval. None of this uses Supabase's Auth SMTP (that's only for signup/reset emails) — it's a separate mailer the app controls.
+People get an email when a request comes in or gets accepted, a weekly digest of open requests, unread chat and any empty profile fields (alumni and current members only, not mentors), and admins get a daily reminder if any accounts are waiting for approval. None of this uses Supabase's Auth SMTP (that's only for signup/reset emails) — it's a separate mailer the app controls.
 
 1. **Run the second schema file.** In the SQL Editor, paste in `supabase/notifications.sql` and run it. Before running, replace the two placeholder values in the `insert into public.app_config` statement near the top: `webhook_url` (your deployed app's `/api/notify` address) and `webhook_secret` (see below).
 2. **Set these environment variables** on Vercel (and in `.env.local` for local testing) — see `.env.example` for the full list: `SUPABASE_SERVICE_ROLE_KEY`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `EMAIL_FROM`, `APP_URL`, `NOTIFY_WEBHOOK_SECRET`, `CRON_SECRET`.

@@ -46,6 +46,10 @@ People get an email when a request comes in or gets accepted, a weekly digest of
 
 If you ever change the app's domain, update the `webhook_url` row in `app_config` (SQL Editor: `update public.app_config set value = '...' where key = 'webhook_url';`) and the `APP_URL` environment variable to match.
 
+### Resumes
+
+Anyone can upload one resume (PDF, up to 5 MB) from their profile page; any approved signed-in user can view it, same as the rest of a profile. Run `supabase/resumes.sql` once in the SQL Editor to create the storage bucket and its access rules. No new environment variables needed.
+
 ## How it works
 
 **Accounts.** People sign up as a current member or an alum. An admin approves each account on the Admin page (reached from your profile) and can correct the role. People cannot change their own role, status or admin flag.

@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { useMe } from '@/components/auth';
 import { Avatar, BackHeader, Empty, ErrorNote, Icon, Loading } from '@/components/ui';
 import { REQUEST_TYPES, errorMessage, nextResetLabel } from '@/lib/format';
+import { getResumeUrl } from '@/lib/resume';
 import { supabase, unwrap } from '@/lib/supabase';
 import type { Profile } from '@/lib/types';
 import { useLoad } from '@/lib/use-load';
@@ -18,11 +19,12 @@ export default function ProfilePage() {
   const [actionError, setActionError] = useState<string | null>(null);
 
   const { data, error, loading } = useLoad(async () => {
-    const [person, used] = await Promise.all([
+    const [person, used, resumeUrl] = await Promise.all([
       unwrap<Profile | null>(supabase.from('profiles').select('*').eq('id', id).maybeSingle()),
       unwrap<number>(supabase.rpc('slots_used', { p_alum: id })),
+      getResumeUrl(id),
     ]);
-    return { person, used };
+    return { person, used, resumeUrl };
   }, [id]);
 
   async function message() {
@@ -100,6 +102,12 @@ export default function ProfilePage() {
               <a className="row-start" style={{ gap: 8 }} href={person.linkedin_url} target="_blank" rel="noopener noreferrer">
                 <Icon name="link" size={18} />
                 <span>LinkedIn</span>
+              </a>
+            )}
+            {data?.resumeUrl && (
+              <a className="row-start" style={{ gap: 8 }} href={data.resumeUrl} target="_blank" rel="noopener noreferrer">
+                <Icon name="file" size={18} />
+                <span>Resume (PDF)</span>
               </a>
             )}
             {isAlum && (

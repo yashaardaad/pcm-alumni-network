@@ -1,12 +1,15 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth, useMe } from '@/components/auth';
-import { BackHeader, ErrorNote } from '@/components/ui';
-import { REQUEST_TYPES, SECTORS, normalizeUrl } from '@/lib/format';
+import { BackHeader, ErrorNote, Icon } from '@/components/ui';
+import { REQUEST_TYPES, SECTORS, errorMessage, normalizeUrl } from '@/lib/format';
+import { getResumeUrl, removeResume, uploadResume } from '@/lib/resume';
 import { supabase } from '@/lib/supabase';
 import type { RequestType } from '@/lib/types';
+
+const MAX_RESUME_BYTES = 5 * 1024 * 1024;
 
 export default function MePage() {
   const me = useMe();
@@ -29,6 +32,46 @@ export default function MePage() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
+
+  const [resumeUrl, setResumeUrl] = useState<string | null>(null);
+  const [resumeBusy, setResumeBusy] = useState(false);
+  const [resumeError, setResumeError] = useState<string | null>(null);
+
+  useEffect(() => {
+    getResumeUrl(me.id).then(setResumeUrl);
+  }, [me.id]);
+
+  async function handleResumeFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    if (file.type !== 'application/pdf') return setResumeError('Resume must be a PDF.');
+    if (file.size > MAX_RESUME_BYTES) return setResumeError('Resume must be under 5 MB.');
+
+    setResumeBusy(true);
+    setResumeError(null);
+    try {
+      await uploadResume(me.id, file);
+      setResumeUrl(await getResumeUrl(me.id));
+    } catch (err) {
+      setResumeError(errorMessage(err));
+    } finally {
+      setResumeBusy(false);
+    }
+  }
+
+  async function handleResumeRemove() {
+    setResumeBusy(true);
+    setResumeError(null);
+    try {
+      await removeResume(me.id);
+      setResumeUrl(null);
+    } catch (err) {
+      setResumeError(errorMessage(err));
+    } finally {
+      setResumeBusy(false);
+    }
+  }
 
   const set = (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setSaved(false);
@@ -134,6 +177,25 @@ export default function MePage() {
           <div className="field">
             <label htmlFor="bio">About</label>
             <textarea id="bio" rows={4} maxLength={600} placeholder={isAlum ? 'What you cover and what you are happy to talk about.' : 'What you are working on and interested in.'} value={form.bio} onChange={set('bio')} />
+          </div>
+
+          <div className="field">
+            <span className="field-label">Resume (PDF)</span>
+            {resumeUrl ? (
+              <div className="row-start" style={{ gap: 10 }}>
+                <a className="btn" href={resumeUrl} target="_blank" rel="noopener noreferrer">
+                  <Icon name="file" size={18} />
+                  View resume
+                </a>
+                <button type="button" className="btn" onClick={handleResumeRemove} disabled={resumeBusy}>
+                  Remove
+                </button>
+              </div>
+            ) : (
+              <span className="small muted">No resume uploaded yet.</span>
+            )}
+            <input type="file" accept="application/pdf" onChange={handleResumeFile} disabled={resumeBusy} />
+            <ErrorNote>{resumeError}</ErrorNote>
           </div>
 
           {isAlum && (

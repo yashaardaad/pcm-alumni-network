@@ -48,6 +48,12 @@ const PATHS: Record<string, React.ReactNode> = {
       <path d="M9.5 14.5l5-5" />
     </>
   ),
+  file: (
+    <>
+      <path d="M7 4.5h7l3 3v12a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1v-14a1 1 0 0 1 1-1z" />
+      <path d="M14 4.5v3h3" />
+    </>
+  ),
 };
 
 export function Icon({ name, size = 24 }: { name: keyof typeof PATHS | string; size?: number }) {

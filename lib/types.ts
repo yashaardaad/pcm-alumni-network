@@ -10,6 +10,7 @@ export type Profile = {
   role: Role;
   status: Status;
   is_admin: boolean;
+  is_mentor: boolean;
   grad_year: number | null;
   headline: string | null;
   company: string | null;
@@ -99,6 +100,7 @@ export type AdminUser = {
   role: Role;
   status: Status;
   is_admin: boolean;
+  is_mentor: boolean;
   grad_year: number | null;
   created_at: string;
 };

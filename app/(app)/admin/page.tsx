@@ -44,13 +44,14 @@ export default function AdminPage() {
     }
   }
 
-  const update = (user: AdminUser, change: { status?: Status; role?: Role; is_admin?: boolean }) =>
+  const update = (user: AdminUser, change: { status?: Status; role?: Role; is_admin?: boolean; is_mentor?: boolean }) =>
     run(() =>
       supabase.rpc('admin_update_user', {
         p_user: user.id,
         p_status: change.status ?? null,
         p_role: change.role ?? null,
         p_is_admin: change.is_admin ?? null,
+        p_is_mentor: change.is_mentor ?? null,
       }),
     );
 
@@ -89,15 +90,18 @@ export default function AdminPage() {
                 <span className="strong">{u.full_name}</span>
                 <span className="small muted">{u.email}</span>
                 <span className="small muted">
-                  Says they are {u.role === 'alumni' ? 'an alum' : 'a current member'}
+                  Says they are {u.role === 'alumni' ? (u.is_mentor ? 'a mentor' : 'an alum') : 'a current member'}
                   {u.grad_year ? `, class of ${u.grad_year}` : ''}
                 </span>
               </div>
-              <div className="btn-pair">
-                <button className="btn primary" disabled={busy} onClick={() => update(u, { status: 'approved', role: 'alumni' })}>
+              <div className="btn-pair" style={{ gridTemplateColumns: 'repeat(3, minmax(0, 1fr))' }}>
+                <button className="btn primary" disabled={busy} onClick={() => update(u, { status: 'approved', role: 'alumni', is_mentor: false })}>
                   Approve as alum
                 </button>
-                <button className="btn primary" disabled={busy} onClick={() => update(u, { status: 'approved', role: 'member' })}>
+                <button className="btn primary" disabled={busy} onClick={() => update(u, { status: 'approved', role: 'alumni', is_mentor: true })}>
+                  Approve as mentor
+                </button>
+                <button className="btn primary" disabled={busy} onClick={() => update(u, { status: 'approved', role: 'member', is_mentor: false })}>
                   Approve as member
                 </button>
               </div>
@@ -213,7 +217,10 @@ export default function AdminPage() {
                   <span className="strong">{u.full_name}</span>
                   <span className="small muted truncate">{u.email}</span>
                 </div>
-                {u.is_admin && <Tag>Admin</Tag>}
+                <div className="row-start" style={{ gap: 6 }}>
+                  {u.is_admin && <Tag>Admin</Tag>}
+                  {u.is_mentor && <Tag tone="neutral">Mentor</Tag>}
+                </div>
               </div>
               <div className="row-between">
                 <select
@@ -224,27 +231,37 @@ export default function AdminPage() {
                   onChange={(e) => update(u, { role: e.target.value as Role })}
                 >
                   <option value="member">Current member{u.grad_year ? ` ’${String(u.grad_year).slice(-2)}` : ''}</option>
-                  <option value="alumni">Alum{u.grad_year ? ` ’${String(u.grad_year).slice(-2)}` : ''}</option>
+                  <option value="alumni">
+                    {u.is_mentor ? 'Mentor' : 'Alum'}
+                    {u.grad_year ? ` ’${String(u.grad_year).slice(-2)}` : ''}
+                  </option>
                 </select>
-                {u.id !== me.id && (
-                  <div className="row-start" style={{ gap: 14 }}>
-                    <button className="link-btn" disabled={busy} onClick={() => update(u, { is_admin: !u.is_admin })}>
-                      {u.is_admin ? 'Remove admin' : 'Make admin'}
+                <div className="row-start" style={{ gap: 14 }}>
+                  {u.role === 'alumni' && (
+                    <button className="link-btn" disabled={busy} onClick={() => update(u, { is_mentor: !u.is_mentor })}>
+                      {u.is_mentor ? 'Unmark mentor' : 'Mark as mentor'}
                     </button>
-                    <button
-                      className="link-btn"
-                      style={{ color: 'var(--danger)' }}
-                      disabled={busy}
-                      onClick={() => {
-                        if (window.confirm(`Remove ${u.full_name}'s access? They will be locked out of the network until you restore it.`)) {
-                          void update(u, { status: 'rejected' });
-                        }
-                      }}
-                    >
-                      Remove access
-                    </button>
-                  </div>
-                )}
+                  )}
+                  {u.id !== me.id && (
+                    <>
+                      <button className="link-btn" disabled={busy} onClick={() => update(u, { is_admin: !u.is_admin })}>
+                        {u.is_admin ? 'Remove admin' : 'Make admin'}
+                      </button>
+                      <button
+                        className="link-btn"
+                        style={{ color: 'var(--danger)' }}
+                        disabled={busy}
+                        onClick={() => {
+                          if (window.confirm(`Remove ${u.full_name}'s access? They will be locked out of the network until you restore it.`)) {
+                            void update(u, { status: 'rejected' });
+                          }
+                        }}
+                      >
+                        Remove access
+                      </button>
+                    </>
+                  )}
+                </div>
               </div>
             </div>
           ))}

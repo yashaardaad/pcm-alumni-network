@@ -163,9 +163,12 @@ export default function DirectoryPage() {
                 <Avatar name={a.full_name} />
                 <div className="grow stack tight">
                   <div className="row-between" style={{ alignItems: 'baseline' }}>
-                    <span className="strong" style={{ fontSize: 16 }}>
-                      {a.full_name}
-                    </span>
+                    <div className="row-start" style={{ gap: 6, alignItems: 'baseline' }}>
+                      <span className="strong" style={{ fontSize: 16 }}>
+                        {a.full_name}
+                      </span>
+                      {a.is_mentor && <Tag tone="neutral">Mentor</Tag>}
+                    </div>
                     <span className="label" style={{ whiteSpace: 'nowrap' }}>
                       {[shortYear(a.grad_year), a.city].filter(Boolean).join(' · ')}
                     </span>

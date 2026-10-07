@@ -111,7 +111,7 @@ export default function MePage() {
       <BackHeader href="/directory" label="directory" title="Your profile" />
       <main className="content">
         <p className="small muted">
-          Signed in as {session?.user.email} · {isAlum ? 'Alum' : 'Current member'}
+          Signed in as {session?.user.email} · {isAlum ? (me.is_mentor ? 'Mentor' : 'Alum') : 'Current member'}
           {me.is_admin ? ' · Admin' : ''}
         </p>
 

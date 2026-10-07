@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useMe } from '@/components/auth';
-import { Avatar, BackHeader, Empty, ErrorNote, Icon, Loading } from '@/components/ui';
+import { Avatar, BackHeader, Empty, ErrorNote, Icon, Loading, Tag } from '@/components/ui';
 import { REQUEST_TYPES, errorMessage, nextResetLabel } from '@/lib/format';
 import { getResumeUrl } from '@/lib/resume';
 import { supabase, unwrap } from '@/lib/supabase';
@@ -57,12 +57,15 @@ export default function ProfilePage() {
             <div className="row-start" style={{ gap: 16 }}>
               <Avatar name={person.full_name} size={68} />
               <div className="stack tight grow">
-                <h1 className="back-title" style={{ fontSize: 24, lineHeight: '30px' }}>
-                  {person.full_name}
-                </h1>
+                <div className="row-start" style={{ gap: 8, alignItems: 'baseline' }}>
+                  <h1 className="back-title" style={{ fontSize: 24, lineHeight: '30px' }}>
+                    {person.full_name}
+                  </h1>
+                  {person.is_mentor && <Tag tone="neutral">Mentor</Tag>}
+                </div>
                 <span className="muted" style={{ fontSize: 14 }}>
                   {[person.headline, person.company].filter(Boolean).join(' · ') ||
-                    (isAlum ? 'Alum' : 'Current member')}
+                    (isAlum ? (person.is_mentor ? 'Mentor' : 'Alum') : 'Current member')}
                 </span>
                 <span className="label">
                   {[person.grad_year ? `Class of ${person.grad_year}` : null, person.city].filter(Boolean).join(' · ')}

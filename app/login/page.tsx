@@ -16,7 +16,7 @@ export default function LoginPage() {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState<'member' | 'alumni'>('member');
+  const [signupType, setSignupType] = useState<'member' | 'alumni' | 'mentor'>('member');
   const [gradYear, setGradYear] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -41,7 +41,11 @@ export default function LoginPage() {
           password,
           options: {
             emailRedirectTo: `${window.location.origin}/directory`,
-            data: { full_name: fullName.trim(), role, grad_year: gradYear.trim() },
+            data: {
+              full_name: fullName.trim(),
+              role: signupType,
+              grad_year: signupType === 'mentor' ? '' : gradYear.trim(),
+            },
           },
         });
         if (error) throw error;
@@ -94,18 +98,23 @@ export default function LoginPage() {
                 I am
               </span>
               <div className="radio-row" role="group" aria-labelledby="role-label">
-                <button type="button" className={role === 'member' ? 'btn selected' : 'btn'} aria-pressed={role === 'member'} onClick={() => setRole('member')}>
+                <button type="button" className={signupType === 'member' ? 'btn selected' : 'btn'} aria-pressed={signupType === 'member'} onClick={() => setSignupType('member')}>
                   A current member
                 </button>
-                <button type="button" className={role === 'alumni' ? 'btn selected' : 'btn'} aria-pressed={role === 'alumni'} onClick={() => setRole('alumni')}>
+                <button type="button" className={signupType === 'alumni' ? 'btn selected' : 'btn'} aria-pressed={signupType === 'alumni'} onClick={() => setSignupType('alumni')}>
                   An alum
+                </button>
+                <button type="button" className={signupType === 'mentor' ? 'btn selected' : 'btn'} aria-pressed={signupType === 'mentor'} onClick={() => setSignupType('mentor')}>
+                  A mentor
                 </button>
               </div>
             </div>
-            <div className="field">
-              <label htmlFor="year">Class year</label>
-              <input id="year" required inputMode="numeric" pattern="(19|20)[0-9]{2}" placeholder="2027" value={gradYear} onChange={(e) => setGradYear(e.target.value)} />
-            </div>
+            {signupType !== 'mentor' && (
+              <div className="field">
+                <label htmlFor="year">Class year</label>
+                <input id="year" required inputMode="numeric" pattern="(19|20)[0-9]{2}" placeholder="2027" value={gradYear} onChange={(e) => setGradYear(e.target.value)} />
+              </div>
+            )}
           </>
         )}
         <div className="field">

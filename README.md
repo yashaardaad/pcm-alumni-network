@@ -50,6 +50,10 @@ If you ever change the app's domain, update the `webhook_url` row in `app_config
 
 Current members can upload one resume (PDF, up to 5 MB) from their profile page; any approved signed-in user, including alumni, can view it (so an alum can review it), same as the rest of a profile. Alumni do not get this option. Run `supabase/resumes.sql` once in the SQL Editor to create the storage bucket and its access rules. No new environment variables needed.
 
+### Mentors
+
+Mentors are people who were never part of the fund but help mentor students. They sign up by choosing "A mentor" instead of "A current member" or "An alum" -- under the hood they're stored exactly as an alum (`role = 'alumni'`), with an `is_mentor` flag on top for labeling, so they automatically get the exact same permissions, restrictions, and settings as alumni (requests, chat, events, directory, `open_to`, `monthly_cap`) with nothing extra to configure. An admin can also flip someone's mentor flag after the fact from the Admin page's People list, or approve a pending account directly as a mentor. Run `supabase/mentors.sql` once in the SQL Editor to add the column and update the admin functions. No new environment variables needed.
+
 ### Event files
 
 Each event can carry up to 3 files (PDF, Word, Excel, or PowerPoint, up to 20 MB each). Any admin (whether a current member or an alum) can add or remove a file on any event, regardless of whether it's past, present, or future; anyone who can see the event can view and download its files. The event list also shows who has RSVPed (names only, not linked to their profiles). Run `supabase/event-files.sql` once in the SQL Editor to create the storage bucket, table, and access rules. No new environment variables needed.

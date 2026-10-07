@@ -106,7 +106,11 @@ export default function ThreadPage() {
         </Link>
         <div className="stack tight grow">
           <h1 className="strong truncate" style={{ fontSize: 16 }}>
-            {title}
+            {!isChannel && conversation?.other_id ? (
+              <Link href={`/directory/${conversation.other_id}`}>{title}</Link>
+            ) : (
+              title
+            )}
           </h1>
           <span className="small muted">{subtitle}</span>
         </div>
@@ -129,7 +133,12 @@ export default function ThreadPage() {
             <div key={m.id} className={mine ? 'msg mine' : 'msg'}>
               {startsGroup && (
                 <span className="msg-meta">
-                  {mine ? 'You' : (m.sender?.full_name ?? 'Former member')} · {messageTime(m.created_at)}
+                  {mine ? (
+                    'You'
+                  ) : (
+                    <Link href={`/directory/${m.sender_id}`}>{m.sender?.full_name ?? 'Former member'}</Link>
+                  )}{' '}
+                  · {messageTime(m.created_at)}
                 </span>
               )}
               <div className="bubble">{m.body}</div>

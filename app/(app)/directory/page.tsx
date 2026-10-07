@@ -21,16 +21,37 @@ export default function DirectoryPage() {
   const [year, setYear] = useState('');
 
   const { data, error, loading } = useLoad(async () => {
-    const [alumni, used] = await Promise.all([
+    const [alumni, used, connections] = await Promise.all([
       unwrap<Profile[]>(
         supabase.from('profiles').select('*').eq('role', 'alumni').eq('status', 'approved').order('full_name'),
       ),
       unwrap<{ alum_id: string; used: number }[]>(supabase.rpc('alumni_slots_used')),
+      me.role === 'alumni'
+        ? unwrap<{ requester: Profile | Profile[] }[]>(
+            supabase
+              .from('requests')
+              .select('requester:requester_id(*)')
+              .eq('alum_id', me.id)
+              .eq('status', 'accepted'),
+          )
+        : Promise.resolve([]),
     ]);
-    return { alumni, used: new Map(used.map((u) => [u.alum_id, u.used])) };
-  }, []);
+
+    const seen = new Map<string, Profile>();
+    for (const row of connections) {
+      const p = Array.isArray(row.requester) ? row.requester[0] : row.requester;
+      if (p) seen.set(p.id, p);
+    }
+
+    return {
+      alumni,
+      used: new Map(used.map((u) => [u.alum_id, u.used])),
+      connections: [...seen.values()].sort((a, b) => a.full_name.localeCompare(b.full_name)),
+    };
+  }, [me.id, me.role]);
 
   const alumni = useMemo(() => data?.alumni ?? [], [data]);
+  const connections = useMemo(() => data?.connections ?? [], [data]);
   const sectors = useMemo(() => uniqueSorted(alumni.map((a) => a.sector)), [alumni]);
   const cities = useMemo(() => uniqueSorted(alumni.map((a) => a.city)), [alumni]);
   const years = useMemo(() => uniqueSorted(alumni.map((a) => a.grad_year)).reverse(), [alumni]);
@@ -100,6 +121,31 @@ export default function DirectoryPage() {
       <main className="content flush">
         {loading && <Loading label="Loading alumni" />}
         <ErrorNote>{error}</ErrorNote>
+
+        {connections.length > 0 && (
+          <div className="list" style={{ marginBottom: 12 }}>
+            <h2 className="label" style={{ padding: '0 16px', marginBottom: 6 }}>
+              People you&rsquo;ve connected with
+            </h2>
+            {connections.map((c) => (
+              <Link key={c.id} href={`/directory/${c.id}`} className="list-row">
+                <Avatar name={c.full_name} />
+                <div className="grow stack tight">
+                  <div className="row-between" style={{ alignItems: 'baseline' }}>
+                    <span className="strong" style={{ fontSize: 16 }}>
+                      {c.full_name}
+                    </span>
+                    <span className="label" style={{ whiteSpace: 'nowrap' }}>
+                      {[shortYear(c.grad_year), c.city].filter(Boolean).join(' · ')}
+                    </span>
+                  </div>
+                  <span className="small muted">Current member</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
+
         {data && shown.length === 0 && (
           <Empty title={filtering ? 'No alumni match those filters' : 'No alumni have joined yet'}>
             {filtering ? 'Try clearing a filter or searching for something broader.' : 'Invite alumni to create an account, then approve them from the Admin page.'}
@@ -107,6 +153,11 @@ export default function DirectoryPage() {
         )}
         {shown.length > 0 && (
           <div className="list">
+            {connections.length > 0 && (
+              <h2 className="label" style={{ padding: '0 16px', marginBottom: 6 }}>
+                Alumni
+              </h2>
+            )}
             {shown.map((a) => (
               <Link key={a.id} href={`/directory/${a.id}`} className="list-row">
                 <Avatar name={a.full_name} />

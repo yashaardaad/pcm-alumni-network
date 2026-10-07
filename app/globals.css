@@ -694,6 +694,14 @@ select.chip.active {
   font-size: 12px;
   color: var(--muted);
 }
+.msg-meta a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--line);
+}
+.msg-meta a:hover {
+  color: var(--maroon);
+}
 .bubble {
   padding: 9px 13px;
   border-radius: 16px;

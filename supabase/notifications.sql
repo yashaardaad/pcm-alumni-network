@@ -17,6 +17,7 @@ create table if not exists public.app_config (
   value text not null
 );
 revoke all on public.app_config from anon, authenticated;
+alter table public.app_config enable row level security;
 
 insert into public.app_config (key, value) values
   ('webhook_url', 'https://pcm-alumni-network.vercel.app/api/notify'),

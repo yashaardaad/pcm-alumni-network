@@ -40,17 +40,26 @@ create policy "event files: read" on public.event_files for select to authentica
     )
   );
 
+-- Security definer: runs as the table owner, so counting rows here does
+-- not re-trigger this table's own RLS policies (which would otherwise be
+-- a self-reference and raise "infinite recursion detected in policy").
+create function public.event_file_count(p_event uuid) returns int
+language sql stable security definer set search_path = public as $$
+  select count(*)::int from public.event_files where event_id = p_event;
+$$;
+
 create policy "event files: admin add" on public.event_files for insert to authenticated
   with check (
     uploaded_by = auth.uid()
     and public.is_admin()
-    and (select count(*) from public.event_files f where f.event_id = event_id) < 3
+    and public.event_file_count(event_id) < 3
   );
 
 create policy "event files: admin remove" on public.event_files for delete to authenticated
   using (public.is_admin());
 
 grant select, insert, delete on public.event_files to authenticated;
+grant execute on function public.event_file_count(uuid) to authenticated;
 
 create policy "event-files bucket: admin write" on storage.objects for insert to authenticated
   with check (bucket_id = 'event-files' and public.is_admin());

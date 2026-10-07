@@ -2,9 +2,10 @@
 -- Run this once, after schema.sql, in the same project: SQL Editor > New query > paste > Run.
 --
 -- Up to 3 files per event (PDF, Word, Excel, or PowerPoint, up to 20 MB
--- each), stored in a private "event-files" bucket. Any alumni can add or
--- remove a file on any event, no matter whether it is past, present, or
--- future. Anyone who can see the event can view its files.
+-- each), stored in a private "event-files" bucket. Any admin (whether a
+-- current member or an alum) can add or remove a file on any event, no
+-- matter whether it is past, present, or future. Anyone who can see the
+-- event can view its files.
 
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 values ('event-files', 'event-files', false, 20971520, array[
@@ -39,31 +40,23 @@ create policy "event files: read" on public.event_files for select to authentica
     )
   );
 
-create policy "event files: alumni add" on public.event_files for insert to authenticated
+create policy "event files: admin add" on public.event_files for insert to authenticated
   with check (
     uploaded_by = auth.uid()
-    and exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'alumni' and p.status = 'approved')
+    and public.is_admin()
     and (select count(*) from public.event_files f where f.event_id = event_id) < 3
   );
 
-create policy "event files: alumni remove" on public.event_files for delete to authenticated
-  using (
-    exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'alumni' and p.status = 'approved')
-  );
+create policy "event files: admin remove" on public.event_files for delete to authenticated
+  using (public.is_admin());
 
 grant select, insert, delete on public.event_files to authenticated;
 
-create policy "event-files bucket: alumni write" on storage.objects for insert to authenticated
-  with check (
-    bucket_id = 'event-files'
-    and exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'alumni' and p.status = 'approved')
-  );
+create policy "event-files bucket: admin write" on storage.objects for insert to authenticated
+  with check (bucket_id = 'event-files' and public.is_admin());
 
-create policy "event-files bucket: alumni delete" on storage.objects for delete to authenticated
-  using (
-    bucket_id = 'event-files'
-    and exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'alumni' and p.status = 'approved')
-  );
+create policy "event-files bucket: admin delete" on storage.objects for delete to authenticated
+  using (bucket_id = 'event-files' and public.is_admin());
 
 create policy "event-files bucket: approved read" on storage.objects for select to authenticated
   using (

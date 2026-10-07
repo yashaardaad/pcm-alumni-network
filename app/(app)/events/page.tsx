@@ -219,7 +219,7 @@ export default function EventsPage() {
                       <Icon name="file" size={16} />
                       {f.file_name}
                     </button>
-                    {me.role === 'alumni' && (
+                    {me.is_admin && (
                       <button
                         className="link-btn"
                         style={{ color: 'var(--danger)' }}
@@ -231,7 +231,7 @@ export default function EventsPage() {
                     )}
                   </div>
                 ))}
-                {me.role === 'alumni' && e.event_files.length < MAX_EVENT_FILES && (
+                {me.is_admin && e.event_files.length < MAX_EVENT_FILES && (
                   <input
                     type="file"
                     accept=".pdf,.ppt,.pptx,.doc,.docx,.xls,.xlsx"

@@ -52,7 +52,7 @@ Current members can upload one resume (PDF, up to 5 MB) from their profile page;
 
 ### Event files
 
-Each event can carry up to 3 files (PDF, Word, Excel, or PowerPoint, up to 20 MB each). Any alum can add or remove a file on any event, regardless of whether it's past, present, or future; anyone who can see the event can view and download its files. The event list also shows who has RSVPed (names only, not linked to their profiles). Run `supabase/event-files.sql` once in the SQL Editor to create the storage bucket, table, and access rules. No new environment variables needed.
+Each event can carry up to 3 files (PDF, Word, Excel, or PowerPoint, up to 20 MB each). Any admin (whether a current member or an alum) can add or remove a file on any event, regardless of whether it's past, present, or future; anyone who can see the event can view and download its files. The event list also shows who has RSVPed (names only, not linked to their profiles). Run `supabase/event-files.sql` once in the SQL Editor to create the storage bucket, table, and access rules. No new environment variables needed.
 
 ## How it works
 

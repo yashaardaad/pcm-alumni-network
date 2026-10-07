@@ -1,0 +1,6 @@
+{
+  "crons": [
+    { "path": "/api/cron/digest", "schedule": "0 13 * * 1" },
+    { "path": "/api/cron/pending-approvals", "schedule": "0 14 * * *" }
+  ]
+}

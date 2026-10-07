@@ -6,7 +6,7 @@ A mobile-first web app for Plintus Capital Management that does three things:
 2. **Keeps alumni in touch** with channels and direct messages.
 3. **Lists events** for alumni, current members, or both, with RSVP and add-to-calendar.
 
-Built with Next.js (App Router, TypeScript) and Supabase (Postgres, auth, live chat). No other services are needed.
+Built with Next.js (App Router, TypeScript) and Supabase (Postgres, auth, live chat). It also sends email notifications (new request, request accepted, a weekly digest, and a daily admin approval reminder) via your own SMTP account.
 
 ## Set it up
 
@@ -34,6 +34,17 @@ These live under Authentication in the dashboard (labels move around between das
 ### Put it online
 
 Push the project to GitHub, import it into Vercel (or any host that runs Next.js), and add the same two environment variables there. Then update the Site URL in Supabase to your live address.
+
+### Email notifications
+
+People get an email when a request comes in or gets accepted, a weekly digest of open requests and unread chat, and admins get a daily reminder if any accounts are waiting for approval. None of this uses Supabase's Auth SMTP (that's only for signup/reset emails) — it's a separate mailer the app controls.
+
+1. **Run the second schema file.** In the SQL Editor, paste in `supabase/notifications.sql` and run it. Before running, replace the two placeholder values in the `insert into public.app_config` statement near the top: `webhook_url` (your deployed app's `/api/notify` address) and `webhook_secret` (see below).
+2. **Set these environment variables** on Vercel (and in `.env.local` for local testing) — see `.env.example` for the full list: `SUPABASE_SERVICE_ROLE_KEY`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `EMAIL_FROM`, `APP_URL`, `NOTIFY_WEBHOOK_SECRET`, `CRON_SECRET`.
+3. **Generate the two secrets** with `openssl rand -hex 32`: one becomes `NOTIFY_WEBHOOK_SECRET` (must match the `webhook_secret` value from step 1 exactly) and the other becomes `CRON_SECRET` (Vercel sends it automatically as a bearer token when it runs the cron jobs below — nothing else to configure).
+4. **Cron schedule** lives in `vercel.json`: the weekly digest and the daily approval reminder. Times are UTC, so they'll drift about an hour across daylight saving.
+
+If you ever change the app's domain, update the `webhook_url` row in `app_config` (SQL Editor: `update public.app_config set value = '...' where key = 'webhook_url';`) and the `APP_URL` environment variable to match.
 
 ## How it works
 

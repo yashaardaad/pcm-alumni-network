@@ -33,6 +33,7 @@ create table public.profiles (
   city text check (char_length(city) <= 60),
   bio text check (char_length(bio) <= 600),
   fund_role text check (char_length(fund_role) <= 120),
+  linkedin_url text check (char_length(linkedin_url) <= 200),
   open_to public.request_type[] not null default '{}',
   monthly_cap int not null default 3 check (monthly_cap between 0 and 20),
   created_at timestamptz not null default now()
@@ -525,7 +526,7 @@ from anon, authenticated;
 
 grant usage on schema public to authenticated;
 grant select on public.profiles to authenticated;
-grant update (full_name, grad_year, headline, company, sector, city, bio, fund_role, open_to, monthly_cap)
+grant update (full_name, grad_year, headline, company, sector, city, bio, fund_role, linkedin_url, open_to, monthly_cap)
   on public.profiles to authenticated;
 grant select on public.requests to authenticated;
 grant select, insert, delete on public.conversations to authenticated;

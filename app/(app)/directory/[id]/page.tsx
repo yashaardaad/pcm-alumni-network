@@ -96,6 +96,12 @@ export default function ProfilePage() {
                 <p>{person.fund_role}</p>
               </section>
             )}
+            {person.linkedin_url && (
+              <a className="row-start" style={{ gap: 8 }} href={person.linkedin_url} target="_blank" rel="noopener noreferrer">
+                <Icon name="link" size={18} />
+                <span>LinkedIn</span>
+              </a>
+            )}
             {isAlum && (
               <section className="stack tight">
                 <h2 className="label" style={{ marginBottom: 4 }}>

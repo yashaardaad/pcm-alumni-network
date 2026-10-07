@@ -17,6 +17,7 @@ export type Profile = {
   city: string | null;
   bio: string | null;
   fund_role: string | null;
+  linkedin_url: string | null;
   open_to: RequestType[];
   monthly_cap: number;
   created_at: string;

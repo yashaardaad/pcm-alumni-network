@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { useAuth, useMe } from '@/components/auth';
 import { BackHeader, ErrorNote } from '@/components/ui';
-import { REQUEST_TYPES, SECTORS } from '@/lib/format';
+import { REQUEST_TYPES, SECTORS, normalizeUrl } from '@/lib/format';
 import { supabase } from '@/lib/supabase';
 import type { RequestType } from '@/lib/types';
 
@@ -22,6 +22,7 @@ export default function MePage() {
     city: me.city ?? '',
     fund_role: me.fund_role ?? '',
     bio: me.bio ?? '',
+    linkedin_url: me.linkedin_url ?? '',
   });
   const [openTo, setOpenTo] = useState<RequestType[]>(me.open_to);
   const [cap, setCap] = useState(me.monthly_cap);
@@ -50,6 +51,7 @@ export default function MePage() {
         city: text(form.city),
         fund_role: text(form.fund_role),
         bio: text(form.bio),
+        linkedin_url: normalizeUrl(form.linkedin_url),
         open_to: isAlum ? openTo : [],
         monthly_cap: cap,
       })
@@ -116,6 +118,18 @@ export default function MePage() {
           <div className="field">
             <label htmlFor="fund_role">{isAlum ? 'What you did on the fund' : 'Your role on the fund'}</label>
             <input id="fund_role" maxLength={120} placeholder="Consumer sector analyst" value={form.fund_role} onChange={set('fund_role')} />
+          </div>
+          <div className="field">
+            <label htmlFor="linkedin_url">LinkedIn</label>
+            <input
+              id="linkedin_url"
+              type="text"
+              inputMode="url"
+              maxLength={200}
+              placeholder="linkedin.com/in/yourname"
+              value={form.linkedin_url}
+              onChange={set('linkedin_url')}
+            />
           </div>
           <div className="field">
             <label htmlFor="bio">About</label>

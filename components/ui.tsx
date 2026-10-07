@@ -41,6 +41,13 @@ const PATHS: Record<string, React.ReactNode> = {
     </>
   ),
   send: <path d="M5 12h13M12.5 6l6 6-6 6" />,
+  link: (
+    <>
+      <path d="M13 7.5l1.6-1.6a3 3 0 1 1 4.3 4.3L17 11.7" />
+      <path d="M11 16.5l-1.6 1.6a3 3 0 1 1-4.3-4.3L6.6 12.3" />
+      <path d="M9.5 14.5l5-5" />
+    </>
+  ),
 };
 
 export function Icon({ name, size = 24 }: { name: keyof typeof PATHS | string; size?: number }) {

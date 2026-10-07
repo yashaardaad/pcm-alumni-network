@@ -45,6 +45,13 @@ export function initials(name: string) {
 export const shortYear = (year: number | null) =>
   year ? `\u2019${String(year).slice(-2)}` : null;
 
+/** Adds https:// if missing, so a saved profile link always opens correctly. */
+export function normalizeUrl(raw: string) {
+  const v = raw.trim();
+  if (!v) return null;
+  return /^https?:\/\//i.test(v) ? v : `https://${v}`;
+}
+
 export function errorMessage(e: unknown) {
   if (e instanceof Error) return e.message;
   if (typeof e === 'object' && e && 'message' in e) return String((e as { message: unknown }).message);

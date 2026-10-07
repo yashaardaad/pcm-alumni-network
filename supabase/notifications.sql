@@ -73,6 +73,20 @@ create trigger request_accepted_notify
   after update on public.requests
   for each row execute function public.on_request_accepted();
 
+create function public.on_account_approved() returns trigger
+language plpgsql security definer set search_path = public as $$
+begin
+  if new.status = 'approved' and old.status is distinct from 'approved' then
+    perform public.notify_webhook('account_approved', jsonb_build_object('user_id', new.id));
+  end if;
+  return new;
+end;
+$$;
+
+create trigger profile_approved_notify
+  after update on public.profiles
+  for each row execute function public.on_account_approved();
+
 -- ---------------------------------------------------------------------------
 -- Unread message count for any user, for the weekly digest. Mirrors
 -- can_access_conversation() in schema.sql but takes a user id instead of

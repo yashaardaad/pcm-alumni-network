@@ -17,6 +17,34 @@ export async function POST(req: NextRequest) {
   }
 
   const { event, payload } = await req.json();
+
+  if (event === 'account_approved') {
+    const userId: string | undefined = payload?.user_id;
+    if (!userId) return NextResponse.json({ error: 'Missing user_id' }, { status: 400 });
+
+    const { data: profile } = await supabaseAdmin
+      .from('profiles')
+      .select('full_name, role')
+      .eq('id', userId)
+      .single();
+    const to = await emailFor(userId);
+    if (to) {
+      const isAlum = profile?.role === 'alumni';
+      await sendMail(
+        to,
+        "You're approved for PCM Alumni Network",
+        `<p>Hi ${profile?.full_name ?? 'there'},</p>
+         <p>Your account has been approved. You can now sign in and ${
+           isAlum
+             ? 'start accepting requests from current members, join alumni channels, and message other alumni directly.'
+             : 'browse the alumni directory and send requests for coffee chats, resume reviews, and mock interviews.'
+         }</p>
+         <p><a href="${APP_URL}" style="color:#5A242C;">Open the app &rarr;</a></p>`,
+      );
+    }
+    return NextResponse.json({ ok: true });
+  }
+
   const requestId: string | undefined = payload?.request_id;
   if (!requestId) return NextResponse.json({ error: 'Missing request_id' }, { status: 400 });
 
